@@ -65,7 +65,7 @@ generate_y = function(proby, data, Uy, row, pos1){
   return(data)
 }
 generate_cluster = function(probw,proby, Uw, Uy1, Uy2, i, pos1, pos2, row, data=NULL){
-  #' @description Generate simulated data for W using spcified probabilities
+  #' @description Generate simulated data for W, Y using spcified probabilities
   #' @param probw,proby matrix. A 1x3 matrix containing cumulative probability and its corresponding cluster
   #' @param data matrix. A 500x6 empty matrix to store simulated data
   #' @param Uw,Uy1,Uy2 float. A float number generated from a uniform distribution
@@ -134,6 +134,8 @@ simulated_data = simulate_data(filepath = filepath)
 get_ij = function(data, cond){
   #' @description Calculate the count of ij
   ij_count = matrix(0, nrow=2, ncol=2)
+  # W always equals 1 but Y can either be 1 or 0 
+  # This leads to a combination of 10, 11 for either W.
   ij_count[1,1] = dim(subset(data,(data[,1]==1 & data[,3]==cond)))[1]
   ij_count[1,2] = dim(subset(data,(data[,1]==1 & data[,5]==cond)))[1]
   ij_count[2,1] = dim(subset(data,(data[,2]==1 & data[,4]==cond)))[1]
@@ -150,16 +152,28 @@ get_i = function(data){
 
 get_j = function(data, cols, cond, j, j_count = NULL){
   #' @description Calculate the count of j
+  #' @data dataframe data to be processed
+  #' @cols vector denotes the columns to process
+  #' @cond int 1 or 0. Denotes whether the observation specify yes (1) or no (0)
+  #' @j 
+  #' @j_count matrix matrix denoting the count of j
+  
+  # Filtering dataframe, containing rows that satisfy cond
+  # for either col[1] or col[2] or both
   test_data = subset(data, (data[,cols[1]]==cond | data[,cols[2]]==cond))
+  # If j_count is null, create a new matrix to store count of j
   if (is.null(j_count)){
     j_count = matrix(0, nrow = 1, ncol = 2)
   }
   for (indi in 1:nrow(test_data)){
+    # When either Y1 or Y2 is available,
+    # add 1 to j_count
     if (is.na(sum(test_data[indi,cols]))){
       j_count[1,j] = j_count[1,j] + 1
     }
     else {
-      #[Solved When cond = 0 , the sum = 0 when it should be 1 or 2
+      # When both are available,
+      # add the proportion that satisfy the condition 
       j_count[1,j] = j_count[1,j] + sum(test_data[indi,cols]==cond) / 2
     }
   }
