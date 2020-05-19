@@ -1,0 +1,19 @@
+---
+title: "test"
+author: "Tung Nguyen"
+date: "4/25/2020"
+output: html_document
+---
+
+
+```{r}
+d = as.data.frame(rep(list(numeric(0)),2))
+names(d) = c('taks','p-value')
+for(i in 1:500){
+ file=paste("task-",i,".RData",sep="")
+ attach(file)
+ d[i,]=unlist(results)
+ detach(pos=2)
+}
+```
+

@@ -1,0 +1,76 @@
+library(foreign)
+library(tidyverse)
+file_path = 'C:/Users/tnguy/Downloads/DOE project/2012 NHIS Adult Sample_CAM_HIT paper 2017-2-17.sav'
+data = read.spss(file_path, to.data.frame=TRUE)
+
+
+### ALT data
+###------
+ALT = data %>% select(ALT_TP31, ALT_TP32, ALT_TP33)
+
+
+### TP_REC
+### ----
+Tp_REC = data %>% select(TP1_REC1, TP1_REC2, TP1_REC3, TP1_REC4)
+
+
+
+### 1_INFF
+### -----
+TP_INF = data %>% select(TP1_INF1, TP1_INF2, TP1_INF3, TP1_INF4, TP1_INF5, TP1_INF6)
+
+
+
+
+###----
+
+### Select 2 factors of interest which are ALT_TP and TP_REC
+ALT_Tp = data %>% select(TP1_REC1, TP1_REC2, TP1_REC3, TP1_REC4,ALT_TP31, ALT_TP32, ALT_TP33)
+
+
+## Drop NA from the data
+ATL_dropna = na.omit(ALT_Tp)
+
+### Handling missing data
+## ---- 
+##Check that asnwers from TP1_REC are either yes or no not NA
+check_data = ATL_dropna %>% select(TP1_REC1, TP1_REC2, TP1_REC3, TP1_REC4)
+
+sum(is.na(check_data))
+## Check that ALT_TP and TP1_REC are both included in the answer
+sum(is.na(ATL_dropna))
+
+
+
+
+
+table(ATL_dropna)
+
+ATL_dropna[,c('TP1_REC1', 'TP1_REC2', 'TP1_REC3', 'TP1_REC4')]
+
+## Catergorical Encoding
+## ----
+for (i in colnames(ATL_dropna)){
+  ATL_dropna[i] = as.numeric(unlist(ATL_dropna[i]))
+}
+
+
+
+### rbind the 1's and 2's rows
+##----
+one.matrix = matrix(c(rep(0,times=16)), nrow=4,ncol=16)
+two.matrix = matrix(c(rep(0,times=16)), nrow=4,ncol=16)
+for (j in 1:3){
+  
+for (i in 1:4){
+
+one.matrix[i,] = one.matrix[i,] + table(ATL_dropna[,i], ATL_dropna[,j+4])[1,]
+two.matrix[i,] = two.matrix[i,] + table(ATL_dropna[,i], ATL_dropna[,j+4])[2,]
+}
+
+}
+# A sane test
+sum(one.matrix[1,]) == sum(table(ATL_dropna[,1], ATL_dropna[,5])[1,]) + sum(table(ATL_dropna[,1], ATL_dropna[,6])[1,]) +  sum(table(ATL_dropna[,1], ATL_dropna[,7])[1,])
+
+
+### Calculate chi
