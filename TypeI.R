@@ -11,7 +11,7 @@ for(p in requiredPackages){
 
 #--- Generating simulated data
 
-pi_R = c(0.4,0.6)
+pi_R = c(0.4,0.5)
 fun = function(p)((p/(0.4-p))/((0.5-p)/(0.1+p)) - 2)
 pw.11 = uniroot(fun, lower=0.0, upper = 1.0)$root
 pw.10 = 0.4 - pw.11
@@ -27,12 +27,14 @@ py.01 = pi_C[2] - py.11
 py.00 = 0.5 + py.11
 py.11 + py.00 + py.10 + py.01
 # shuffle W - Alternative therapies probabilities
-orderw = cbind(c(00,10,11,01),c(pw.00,pw.10,pw.11,pw.01))
+# orderw = cbind(c(00,10,11,01),c(pw.00,pw.10,pw.11,pw.01))
+orderw = cbind(c(01,00,10,11),c(pw.01,pw.00,pw.10,pw.11))
 # orderw1 = orderw[sample(nrow(orderw)),]
 orderw2 = cbind(orderw, cumsum(orderw[,2]))
 
 # shuffle Y - Recommendation sources probabilities
-ordery = cbind(c(00,10,11,01),c(py.00,py.10,py.11,py.01))
+# ordery = cbind(c(00,10,11,01),c(py.00,py.10,py.11,py.01))
+ordery = cbind(c(01,00,10,11),c(py.01,py.00,py.10,py.11))
 # ordery1 = ordery[sample(nrow(ordery)),]
 ordery2 = cbind(ordery, cumsum(ordery[,2]))
 
@@ -103,6 +105,8 @@ generate_cluster = function(probw,proby, Uw, Uy1, Uy2, i, pos1, pos2, row, data=
 
 # Simulating Data for Experiment
 simulate_data = function(filepath, n=500){
+  #' @description Simulating and Saving data to filepath
+  #' @filepath character Path to save simulated data
   count = 1
   Uw = runif(1, 0, 1)
   Uy1 = runif(1, 0, 1)
@@ -245,7 +249,7 @@ ptime = system.time({r <- foreach(icount(trials), .combine=rbind) %dopar% {
 }})
 
 # save p-value in a list
-results = list(task = i, p_value = mean(r >= stat))
+results = list(task = i, p_value = mean(r >= stat), stat, r)
 
 # Save output for later report
 outputName=paste("task-",i,".RData",sep="")

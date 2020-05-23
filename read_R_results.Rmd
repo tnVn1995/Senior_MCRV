@@ -15,5 +15,6 @@ for(i in 1:500){
  d[i,]=unlist(results)
  detach(pos=2)
 }
+sum(d$`p-value` < 0.05) / 500
 ```
 
