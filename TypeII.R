@@ -46,11 +46,11 @@ orderw2 = cbind(orderw, cumsum(orderw[,2]))
 # ordery = cbind(c(00,10,11,01),c(py.00,py.10,py.11,py.01))
 orderyw1 = cbind(c(01,00,10,11),c(pyw1.01,pyw1.00,pyw1.10,pyw1.11))
 # ordery1 = ordery[sample(nrow(ordery)),]
-orderyw1 = cbind(orderyw1, cumsum(ordery[,2]))
+orderyw1 = cbind(orderyw1, cumsum(orderyw1[,2]))
 
 orderyw2 = cbind(c(01,00,10,11),c(pyw2.01,pyw2.00,pyw2.10,pyw2.11))
 # ordery1 = ordery[sample(nrow(ordery)),]
-orderyw2 = cbind(orderyw2, cumsum(ordery[,2]))
+orderyw2 = cbind(orderyw2, cumsum(orderyw2[,2]))
 
 
 #-------------------------------------
@@ -132,7 +132,7 @@ simulate_data = function(filepath, n=500){
     Uw = runif(1, 0, 1)
     Uy1 = runif(1, 0, 1)
     Uy2 = runif(1, 0, 1)
-    simulated_data = generate_cluster(probw = orderw2, proby = probyw1 = orderyw1, 
+    simulated_data = generate_cluster(probw = orderw2, probyw1 = orderyw1, 
                                       probyw2 = orderyw2, Uw = Uw, Uy1=Uy1, Uy2=Uy2, 
                                       i = count+1, pos1=3, pos2=5, data=simulated_data)
     count=count+1
@@ -267,7 +267,7 @@ ptime = system.time({r <- foreach(icount(trials), .combine=rbind) %dopar% {
 }})
 
 # save p-value in a list
-results = list(task = i, p_value = mean(r >= stat), stat, r)
+results = list(task = i, p_value = mean(r >= stat), main_stat = stat, resample_stats = r)
 
 # Save output for later report
 outputName=paste("task-",i,".RData",sep="")

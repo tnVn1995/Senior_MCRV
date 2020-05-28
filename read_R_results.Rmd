@@ -6,15 +6,31 @@ output: html_document
 ---
 
 
-```{r}
-d = as.data.frame(rep(list(numeric(0)),2))
-names(d) = c('taks','p-value')
+```{r store p-values in dataframe}
+d = as.data.frame(rep(list(numeric(0)),3))
+names(d) = c('taks','p-value','test_stat')
 for(i in 1:500){
  file=paste("task-",i,".RData",sep="")
- attach(file)
- d[i,]=unlist(results)
+ attach(file) 
+ d[i,]=c(results$task, results$p_value, results$main_stat)
  detach(pos=2)
 }
 sum(d$`p-value` < 0.05) / 500
+```
+
+```{r store test-stats in dataframe}
+test_stat1 = as.data.frame(rep(list(numeric(0)),1))
+names(test_stat1) = c('bootstrap_teststats')
+file=paste("task-1",".RData",sep="")
+attach(file)
+bootstrap <- as.data.frame(results$bootstrap_teststat)
+for (i in 2:5){
+  file=paste("task-",i,".RData",sep="")
+  attach(file)
+  bootstrap <- cbind(bootstrap, results$bootstrap_teststat)
+}
+names(bootstrap) <- c('bootstrap1','bootstrap2','bootstrap3',
+                      'bootstrap4','bootstrap5')
+
 ```
 
