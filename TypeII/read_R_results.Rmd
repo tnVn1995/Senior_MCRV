@@ -1,0 +1,43 @@
+---
+title: "test"
+author: "Tung Nguyen"
+date: "4/25/2020"
+output: html_document
+---
+
+
+```{r store p-values in dataframe}
+d = as.data.frame(rep(list(numeric(0)),3))
+pos = 2
+names(d) = c('taks','p-value','test_stat')
+for(i in 1:500){
+ file=paste("task-",i,".RData",sep="")
+ attach(file, pos=pos) 
+ d[i,]=c(results$task, results$p_value, results$main_stat)
+ detach(pos=pos)
+}
+sum(d$`p-value` < 0.05) / 500
+write.csv(d, "TypeIIresults.csv")
+```
+
+```{r store test-stats in dataframe}
+pos = 2
+test_stat1 = as.data.frame(rep(list(numeric(0)),1))
+names(test_stat1) = c('bootstrap_teststats')
+file=paste("task-1",".RData",sep="")
+attach(file, pos = pos)
+bootstrap <- as.data.frame(results$resample_stats)
+detach(pos = pos)
+for (i in 2:5){
+  file=paste("task-",i,".RData",sep="")
+  attach(file, pos = pos)
+  bootstrap <- cbind(bootstrap, results$resample_stats)
+  detach(pos = pos)
+
+}
+names(bootstrap) <- c('bootstrap1','bootstrap2','bootstrap3',
+                      'bootstrap4','bootstrap5')
+write.csv(bootstrap, "TypeII-bootstrap_result.csv")
+
+```
+

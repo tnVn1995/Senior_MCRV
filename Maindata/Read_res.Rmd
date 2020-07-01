@@ -1,0 +1,21 @@
+---
+title: "Read_Results"
+author: "Tung Nguyen"
+date: "6/21/2020"
+output: html_document
+---
+
+```{r}
+stat <- 1596.582
+d <- as.data.frame(0)
+names(d) <- c('test_stat')
+for(i in 1:1999){
+ file <- paste("task-",i,".RData",sep="")
+ attach(file,pos=2)
+ d[i,] <- stat.star
+ detach(pos=2)
+}
+print(mean(d >= stat))
+write.csv(d, 'Maindatares.csv', row.names=FALSE)
+```
+

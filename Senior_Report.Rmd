@@ -1,0 +1,60 @@
+---
+title: "Senior Report"
+output:
+  html_notebook: default
+  html_document: default
+  pdf_document: default
+---
+# Testing for Marginal Independence between Two Categorical Variables with Multiple Responses
+
+Mind and body practices may be used to improve health and well-being or to help manage symptoms of health problems. The 2012 National Health Interview Survey collected information about Americans’ top 3 commonly used modalities and whether using each modality is because of the recommendation from any doctor, family member, or friend. There are statistical methods to study the association between two multiple response categorical variables, i.e. modality selection and recommendation in the survey. However, due to the way the questions were designed in the survey, no information was collected about failure recommendation. No existing efficient statistical methods can be directly applied to the scenario. In this study, we proposed a modified Pearson chi-square statistic to analyze the special data structure in the survey. Simulations were conducted to evaluate the proposed method.
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo=FALSE,comment=NA)
+requiredPackages = c('data.table','testit','haven','tidyverse')
+for(p in requiredPackages){
+  if(!require(p,character.only = TRUE)) install.packages(p, repos="http://cran.us.r-project.org")
+  library(p,character.only = TRUE)
+}
+```
+
+## Data Structure
+
+```{r read data}
+file_path <- '2012 NHIS Adult Sample_CAM_HIT paper 2017-2-17.sav'
+data <-  haven::read_sav(file_path)
+ALT_Tp = data %>% dplyr::select('TP1_REC1', 'TP1_REC2', 'TP1_REC3', 'TP1_REC4','TP2_REC1', 'TP2_REC2', 'TP2_REC3', 'TP2_REC4',
+                         'TP3_REC1', 'TP3_REC2', 'TP3_REC3', 'TP3_REC4','ALT_TP31', 'ALT_TP32', 'ALT_TP33')
+head(ALT_Tp)
+```
+
+Above are the first five observations of the data. The data contains 16 columns. Column 13-15 show the top 3 choices of alternative therapies for individuals (coded from 1-16,corresponding to 16 alternative therapies). The first 12 columns show the recommendation sources for each individual. Each top choice for an individual can be influenced by one or more of the recommendation sources (e.g family, friends). The first four columns correspond to 4 recommendation sources for the 1st choice of alternative therapy. Similarly, the next 4 columns correspond to the 2nd choice alternative therapy. The last 4 columns are the recommendation sources for the 3rd top choice. In short, an individual can have up to 3 choices of alternative therapies. For each choice of alternative therapies that individual makes, the decision can be influenced by up to four sources of recommendation (e.g: friends, doctor). The research question is whether top 3 alternative therapies are independent with recommendation sources or not. Our research hypothesis is then:
+
+$H_{0}:$ Top 3 Alternative Therapies and Recommendation Sources are independent
+$H_{1}:$ They are not independent
+
+The test for marginal independence of categorical variables with multiple responses is referred by the existing literature as simultaneous pairwise marginal independence (SPMI) test.
+
+```{r Drop rows with only nana values}
+pp_data <- ALT_Tp %>% 
+  dplyr::filter(!(is.na(ALT_TP31)&is.na(ALT_TP32)&is.na(ALT_TP33)))
+```
+
+```{r}
+pp_data <- as.tibble(pp_data)
+pp_data %>% 
+  dplyr::select(head(names(.),12)) %>% 
+  dplyr::filter(TP1_REC1==2)
+
+write.csv(pp_data, 'data.csv', row.names = FALSE)
+```
+## Existing Methods 
+
+There are existing methods to test for independence of categorical variables with multiple responses. Loughin (1998) proposed a Pearson statistic to test for SPMI test. First and Second-Order adjustments were proposed by Rao and Scott (1981) to the Pearson statistic for situations without simple random sampling. Another method is non-parametric bootstrap that approximate the distribution of chi-square  
+
+# Test
+
+## References
+
+1. Bilder, Christopher R., and Thomas M. Loughin. “Testing for Marginal Independence between Two Categorical Variables with Multiple Responses.” Biometrics, vol. 60, no. 1, 2004, pp. 241–248. JSTOR, www.jstor.org/stable/3695573. Accessed 21 June 2020.
+
